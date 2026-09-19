@@ -1,6 +1,6 @@
 param(
     [string]$Root = "C:\Users\leomi\Documents\0 - JORNADAS PC LOCAL",
-    [string]$FolderName = "00 - DOCUMENTAÇÃO CARTORÁRIA",
+    [string]$FolderName = "00-documentacao-cartoraria",
     [string]$GitHubOwner = "leomioishi",
     [string]$RepoName = "documentacao-cartoraria"
 )
@@ -9,16 +9,16 @@ $ErrorActionPreference = "Stop"
 $baseDir = Join-Path $Root $FolderName
 $repoFull = "$GitHubOwner/$RepoName"
 
-Write-Host "== DC | Documentação Cartorária ==" -ForegroundColor Cyan
+Write-Host "== DC | Documentacao Cartoraria ==" -ForegroundColor Cyan
 Write-Host "Destino local: $baseDir"
 Write-Host "Destino Cloud:  $repoFull"
 
-# 1. Pré-checks
+# 1. Pre-checks
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-    throw "Git não encontrado no PATH."
+    throw "Git nao encontrado no PATH."
 }
 if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
-    throw "GitHub CLI (gh) não encontrado no PATH."
+    throw "GitHub CLI (gh) nao encontrado no PATH."
 }
 
 # 2. Pasta local
@@ -36,7 +36,7 @@ foreach ($d in $dirs) {
     New-Item -ItemType Directory -Force -Path (Join-Path $baseDir $d) | Out-Null
 }
 
-# 3. Copiar conteúdo do pacote se o script estiver sendo executado de uma pasta que os contenha
+# 3. Copiar conteudo do pacote se o script estiver sendo executado de uma pasta que os contenha
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $map = @{
     "README.md" = "README.md"
@@ -54,7 +54,7 @@ foreach ($src in $map.Keys) {
     }
 }
 
-# Copia o próprio script para o Cartório
+# Copia o proprio script para o Cartorio
 Copy-Item $MyInvocation.MyCommand.Path (Join-Path $baseDir "03-scripts\dc.ps1") -Force
 
 # 4. Git local
@@ -81,7 +81,7 @@ try {
 } catch {}
 
 if (-not $remoteExists) {
-    Write-Host "Criando repositório GitHub $repoFull ..." -ForegroundColor Yellow
+    Write-Host "Criando repositorio GitHub $repoFull ..." -ForegroundColor Yellow
     gh repo create $repoFull --public --source=. --remote=origin
 } elseif ([string]::IsNullOrWhiteSpace($origin)) {
     git remote add origin "https://github.com/$repoFull.git"
@@ -91,13 +91,13 @@ if (-not $remoteExists) {
 git add .
 $hasChanges = git status --porcelain
 if ($hasChanges) {
-    git commit -m "docs: registra Documentação Cartorária - estrutura inicial DC"
+    git commit -m "docs: registra Documentacao Cartoraria - estrutura inicial DC"
 }
 
 # 7. Push
 git push -u origin main
 
-# 8. Verificação final
+# 8. Verificacao final
 $gitOk = Test-Path (Join-Path $baseDir ".git")
 $originNow = (git remote get-url origin).Trim()
 $statusNow = git status --porcelain
@@ -118,6 +118,6 @@ if ($gitOk -and $cloudOk -and $branchNow -eq "main" -and [string]::IsNullOrWhite
     Write-Host "Cloud:   https://github.com/$repoFull"
 } else {
     Write-Host ""
-    Write-Host "DC ainda não pode ser declarada OK." -ForegroundColor Yellow
+    Write-Host "DC ainda nao pode ser declarada OK." -ForegroundColor Yellow
     Write-Host "Git local: $gitOk | Cloud: $cloudOk | Branch: $branchNow | Working tree limpo: $([string]::IsNullOrWhiteSpace($statusNow))"
 }
